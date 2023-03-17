@@ -3,6 +3,7 @@ import tensorflow as tf
 from tensorflow_docs.vis import embed
 import numpy as np
 import cv2
+from pathlib import Path
 
 # Import matplotlib libraries
 from matplotlib import pyplot as plt
@@ -382,3 +383,23 @@ def run_inference(movenet, image, crop_region, crop_size):
         crop_region['width'] * image_width *
         keypoints_with_scores[0, 0, idx, 1]) / image_width
   return keypoints_with_scores
+
+# END OF GOOGLE'S CODE. MY CODE BELOW
+
+def frame_generator(vid_path:str|Path, milsec:int) -> np.ndarray:
+    """ 
+        vid_path:
+        milsec: the interval between this frame and the next, in milliseconds.
+
+        returns a numpy ndarray for each frame
+    """
+    vid = cv2.VideoCapture(vid_path) # This is lazy read I believe. 
+    success, mil = True, 0
+    while success: 
+        vid.set(cv2.CAP_PROP_POS_MSEC, mil)
+        success, image = vid.read() 
+        if success:
+            yield image 
+            mil += milsec
+          
+    vid.release()
